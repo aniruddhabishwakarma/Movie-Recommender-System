@@ -1,0 +1,96 @@
+<head>
+    <style>
+        /* ✅ Live Search Styling */
+        #search-results {
+            position: absolute;
+            z-index: 50;  /* ✅ Ensures search results appear above everything */
+            width: 100%;
+            background-color: rgba(31, 41, 55, 0.95); /* Dark background */
+            border-radius: 0.5rem;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            max-height: 300px; /* Prevents overflow */
+            overflow-y: auto; /* Enables scrolling if too many results */
+        }
+    </style>
+</head>
+
+<!-- Navbar Component -->
+<nav class="bg-gray-800 p-4 glass">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="/" class="text-xl font-bold text-blue-400">🎬 Movie Recommender</a>
+        
+        <!-- Search Bar with Live Search -->
+        <div class="relative w-64">
+            <input type="text" id="search-input" name="q" value="{{ query }}" placeholder="Search movies..."
+                class="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            
+            <!-- Live Search Results -->
+            <div id="search-results" class="absolute w-full bg-gray-800 text-white rounded-lg mt-1 hidden">
+                <!-- Results will be inserted dynamically -->
+            </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="flex items-center">
+            <a href="/" class="text-gray-300 hover:text-white px-4">Home</a>
+            <a href="/recommend/" class="text-gray-300 hover:text-white px-4">Recommendations</a>
+
+            <!-- User Authentication Links -->
+            {% if user.is_authenticated %}
+                <span class="text-gray-300 px-4">Welcome, {{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="text-gray-300 hover:text-white px-4">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="text-gray-300 hover:text-white px-4">Login</a>
+                <a href="{% url 'register' %}" class="text-gray-300 hover:text-white px-4">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("search-input");
+    const resultsDiv = document.getElementById("search-results");
+
+    searchInput.addEventListener("input", function() {
+        let query = searchInput.value.trim();
+        
+        if (query.length > 1) {
+            fetch(`/search/?q=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                resultsDiv.innerHTML = "";  // Clear previous results
+                
+                if (data.results.length > 0) {
+                    data.results.forEach(movie => {
+                        let movieItem = document.createElement("a");
+                        movieItem.href = `/movie/${movie.id}/`;
+                        movieItem.className = "block px-4 py-2 hover:bg-gray-700";
+                        movieItem.innerHTML = `
+                            <div class="flex items-center">
+                                <img src="${movie.poster_url}" class="w-10 h-14 mr-3 rounded" alt="${movie.title}">
+                                <div>
+                                    <span class="font-bold">${movie.title} (${movie.year})</span>
+                                </div>
+                            </div>
+                        `;
+                        resultsDiv.appendChild(movieItem);
+                    });
+                    resultsDiv.classList.remove("hidden");  // Show results
+                } else {
+                    resultsDiv.classList.add("hidden");
+                }
+            });
+        } else {
+            resultsDiv.classList.add("hidden");
+        }
+    });
+
+    // Hide results when clicking outside
+    document.addEventListener("click", function(event) {
+        if (!searchInput.contains(event.target) && !resultsDiv.contains(event.target)) {
+            resultsDiv.classList.add("hidden");
+        }
+    });
+});
+</script>

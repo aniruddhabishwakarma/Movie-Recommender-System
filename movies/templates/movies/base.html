@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Movie Recommender{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Glassmorphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        #search-results {
+            position: absolute;
+            z-index: 50;  /* ✅ Ensures search results appear above everything */
+            width: 100%;
+            background-color: rgba(31, 41, 55, 0.95); /* Dark background */
+            border-radius: 0.5rem;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            max-height: 300px; /* Prevents overflow */
+            overflow-y: auto; /* Enables scrolling if too many results */
+        }
+        #star-rating span {
+        font-size: 2rem; /* Make stars bigger */
+        cursor: pointer;
+        transition: color 0.3s ease-in-out;
+    }
+
+    #star-rating span:hover {
+        color: #FFD700 !important; /* Highlight on hover */
+    }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    {% include 'movies/navbar.html' %}  <!-- Include the Navbar Component -->
+
+    <div class="container mx-auto py-8">
+        {% block content %}{% endblock %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,188 @@
+{% extends "movies/base.html" %}
+
+{% block title %}{{ movie.title }} - Details{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-gray-800 rounded-xl p-6 shadow-lg">
+    <!-- Movie Header -->
+    <div class="flex flex-col md:flex-row items-center md:items-start">
+        <!-- Movie Poster -->
+        <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="rounded-lg w-64 h-96 object-cover mb-4 md:mb-0">
+        
+        <!-- Movie Details -->
+        <div class="md:ml-6 text-white flex-grow">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-blue-400">{{ movie.title }}</h1>
+                
+                <form id="favorite-form" data-movie-id="{{ movie.id }}">
+                    {% csrf_token %}
+                    <button type="button" id="favorite-button" class="text-2xl transition">
+                        {% if user.is_authenticated and movie in user.favorite_set.all %}
+                            <span id="favorite-icon" class="text-red-500">❤️</span>
+                        {% else %}
+                            <span id="favorite-icon" class="text-gray-400 hover:text-red-500">🤍</span>
+                        {% endif %}
+                    </button>
+                </form>
+            </div>
+            <p class="text-gray-400 text-lg">{{ movie.year }} | IMDb: ⭐ {{ movie.imdb_rating }}</p>
+            
+            <div class="mt-4">
+                <p><strong>Genre:</strong> {{ movie.genre }}</p>
+                <p><strong>Director:</strong> <span class="text-blue-400">{{ movie.director }}</span></p>
+                <p><strong>Cast:</strong> {{ movie.actors }}</p>
+            </div>
+
+            <div class="mt-4">
+                <p class="text-gray-300">{{ movie.plot }}</p>
+            </div>
+
+            <div class="mt-4">
+                <p><strong>Box Office:</strong> {{ movie.box_office }}</p>
+                <p><strong>IMDb Votes:</strong> {{ movie.imdb_votes }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Movies by Same Director -->
+    {% if related_movies %}
+    <div class="mt-6">
+        <h2 class="text-2xl font-bold text-blue-400">Other Movies by {{ movie.director }}</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
+            {% for related in related_movies %}
+            <a href="{% url 'movie_detail' related.id %}" class="backdrop-blur-md bg-white/10 p-4 rounded-xl shadow-lg transform hover:scale-105 transition duration-300 block">
+                <img src="{{ related.poster_url }}" alt="{{ related.title }}" class="rounded-lg h-64 w-full object-cover">
+                <h3 class="text-lg font-semibold mt-2 text-white">{{ related.title }}</h3>
+                <p class="text-sm text-gray-300">{{ related.year }} | IMDb: <span class="text-yellow-400">{{ related.imdb_rating }}</span></p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Review Section -->
+    <div class="mt-8">
+        <h2 class="text-2xl font-bold text-blue-400">User Reviews</h2>
+    
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'submit_review' movie.id %}" class="mt-4 bg-gray-900 p-4 rounded-lg shadow-md">
+            {% csrf_token %}
+
+            <!-- Star Rating Selection -->
+            <div class="mb-3">
+                <label class="block text-gray-300 font-semibold">Your Rating (Optional):</label>
+                <div class="flex space-x-1 text-yellow-400 text-2xl cursor-pointer" id="star-rating">
+                    <span data-value="1">★</span>
+                    <span data-value="2">★</span>
+                    <span data-value="3">★</span>
+                    <span data-value="4">★</span>
+                    <span data-value="5">★</span>
+                </div>
+                <input type="hidden" name="rating" id="rating-input"> <!-- Hidden input to store selected rating -->
+            </div>
+
+            <div class="mb-3">
+                <label for="comment" class="block text-gray-300 font-semibold">Your Review (Optional):</label>
+                <textarea name="comment" id="comment" rows="3"
+                    class="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    placeholder="Write your review here... (or leave blank if only rating)"></textarea>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 shadow-md">
+                Submit Review
+            </button>
+        </form>
+        {% else %}
+        <p class="text-gray-400 mt-3">You must <a href="{% url 'login' %}" class="text-blue-400 hover:underline">log in</a> to leave a review.</p>
+        {% endif %}
+    </div>
+
+    <!-- Display Reviews -->
+    <div class="mt-6">
+        {% for review in reviews %}
+        <div class="bg-gray-900 p-4 rounded-lg shadow-md mb-4">
+            <p class="text-yellow-400">⭐ {{ review.rating }}/5</p>
+            <p class="text-gray-300">{{ review.comment }}</p>
+            <p class="text-gray-500 text-sm mt-2">- {{ review.user.username }}, {{ review.created_at|date:"F d, Y" }}</p>
+        </div>
+        {% empty %}
+        <p class="text-gray-400">No reviews yet. Be the first to review!</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- JavaScript for Clickable Star Rating -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const stars = document.querySelectorAll("#star-rating span");
+        const ratingInput = document.getElementById("rating-input");
+
+        // Ensure stars are not highlighted by default
+        stars.forEach(star => {
+            star.style.color = "#555";  // Reset all stars to default color
+        });
+
+        stars.forEach(star => {
+            star.addEventListener("click", function () {
+                let selectedValue = this.getAttribute("data-value");
+                ratingInput.value = selectedValue; // Store rating in hidden input
+                console.log("Selected rating:", selectedValue); // Debugging
+
+                // Highlight stars only after selection
+                stars.forEach(s => {
+                    s.style.color = s.getAttribute("data-value") <= selectedValue ? "#FFD700" : "#555";
+                });
+            });
+
+            // Provide hover feedback
+            star.addEventListener("mouseover", function () {
+                let hoverValue = this.getAttribute("data-value");
+                stars.forEach(s => {
+                    s.style.color = s.getAttribute("data-value") <= hoverValue ? "#FFD700" : "#555";
+                });
+            });
+
+            // Reset to unselected state when mouse leaves (unless clicked)
+            star.addEventListener("mouseout", function () {
+                let selectedValue = ratingInput.value || 0;
+                stars.forEach(s => {
+                    s.style.color = s.getAttribute("data-value") <= selectedValue ? "#FFD700" : "#555";
+                });
+            });
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+    const favoriteForm = document.getElementById("favorite-form");
+    const favoriteButton = document.getElementById("favorite-button");
+    const favoriteIcon = document.getElementById("favorite-icon");
+
+    favoriteButton.addEventListener("click", function() {
+        const movieId = favoriteForm.getAttribute("data-movie-id");
+        const csrfToken = document.querySelector("input[name=csrfmiddlewaretoken]").value;
+
+        fetch(`/toggle_favorite/${movieId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken,
+                "Content-Type": "application/json"
+            },
+            credentials: "same-origin"
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "added") {
+                favoriteIcon.textContent = "❤️";
+                favoriteIcon.classList.remove("text-gray-400");
+                favoriteIcon.classList.add("text-red-500");
+            } else if (data.status === "removed") {
+                favoriteIcon.textContent = "🤍";
+                favoriteIcon.classList.remove("text-red-500");
+                favoriteIcon.classList.add("text-gray-400");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+</script>
+{% endblock %}
