@@ -14,16 +14,18 @@
             <div class="flex justify-between items-center">
                 <h1 class="text-3xl font-bold text-blue-400">{{ movie.title }}</h1>
                 
-                <form id="favorite-form" data-movie-id="{{ movie.id }}">
-                    {% csrf_token %}
-                    <button type="button" id="favorite-button" class="text-2xl transition">
-                        {% if user.is_authenticated and movie in user.favorite_set.all %}
-                            <span id="favorite-icon" class="text-red-500">❤️</span>
-                        {% else %}
-                            <span id="favorite-icon" class="text-gray-400 hover:text-red-500">🤍</span>
-                        {% endif %}
-                    </button>
-                </form>
+                <!-- ❤️ Favorite Button -->
+<form id="favorite-form" data-movie-id="{{ movie.id }}">
+    {% csrf_token %}
+    <button type="button" id="favorite-button" class="text-2xl transition">
+        {% if user.is_authenticated and is_favorited %}
+            <span id="favorite-icon" class="text-red-500">❤️</span>
+        {% else %}
+            <span id="favorite-icon" class="text-gray-400 hover:text-red-500">🤍</span>
+        {% endif %}
+    </button>
+</form>
+                
             </div>
             <p class="text-gray-400 text-lg">{{ movie.year }} | IMDb: ⭐ {{ movie.imdb_rating }}</p>
             
@@ -112,77 +114,74 @@
     </div>
 </div>
 
-<!-- JavaScript for Clickable Star Rating -->
+<!-- ✅ JavaScript for Star Rating -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const stars = document.querySelectorAll("#star-rating span");
         const ratingInput = document.getElementById("rating-input");
 
-        // Ensure stars are not highlighted by default
-        stars.forEach(star => {
-            star.style.color = "#555";  // Reset all stars to default color
-        });
+        function highlightStars(value) {
+            stars.forEach(star => {
+                star.style.color = star.getAttribute("data-value") <= value ? "#FFD700" : "#555"; // ⭐ Yellow for selected, Gray otherwise
+            });
+        }
 
         stars.forEach(star => {
+            // ✅ Handle star click (set rating)
             star.addEventListener("click", function () {
                 let selectedValue = this.getAttribute("data-value");
-                ratingInput.value = selectedValue; // Store rating in hidden input
-                console.log("Selected rating:", selectedValue); // Debugging
-
-                // Highlight stars only after selection
-                stars.forEach(s => {
-                    s.style.color = s.getAttribute("data-value") <= selectedValue ? "#FFD700" : "#555";
-                });
+                ratingInput.value = selectedValue; // Store rating
+                highlightStars(selectedValue); // Update color
             });
 
-            // Provide hover feedback
+            // ✅ Handle hover (show potential selection)
             star.addEventListener("mouseover", function () {
                 let hoverValue = this.getAttribute("data-value");
-                stars.forEach(s => {
-                    s.style.color = s.getAttribute("data-value") <= hoverValue ? "#FFD700" : "#555";
-                });
+                highlightStars(hoverValue);
             });
 
-            // Reset to unselected state when mouse leaves (unless clicked)
+            // ✅ Reset to selected state on mouse leave
             star.addEventListener("mouseout", function () {
-                let selectedValue = ratingInput.value || 0;
-                stars.forEach(s => {
-                    s.style.color = s.getAttribute("data-value") <= selectedValue ? "#FFD700" : "#555";
-                });
+                highlightStars(ratingInput.value || 0); // Reset to selected or default
             });
         });
     });
-    document.addEventListener("DOMContentLoaded", function() {
-    const favoriteForm = document.getElementById("favorite-form");
-    const favoriteButton = document.getElementById("favorite-button");
-    const favoriteIcon = document.getElementById("favorite-icon");
-
-    favoriteButton.addEventListener("click", function() {
-        const movieId = favoriteForm.getAttribute("data-movie-id");
-        const csrfToken = document.querySelector("input[name=csrfmiddlewaretoken]").value;
-
-        fetch(`/toggle_favorite/${movieId}/`, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": csrfToken,
-                "Content-Type": "application/json"
-            },
-            credentials: "same-origin"
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === "added") {
-                favoriteIcon.textContent = "❤️";
-                favoriteIcon.classList.remove("text-gray-400");
-                favoriteIcon.classList.add("text-red-500");
-            } else if (data.status === "removed") {
-                favoriteIcon.textContent = "🤍";
-                favoriteIcon.classList.remove("text-red-500");
-                favoriteIcon.classList.add("text-gray-400");
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    });
-});
 </script>
+
+
+<!-- ✅ JavaScript for Favorite Button -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const favoriteForm = document.getElementById("favorite-form");
+        const favoriteButton = document.getElementById("favorite-button");
+        const favoriteIcon = document.getElementById("favorite-icon");
+    
+        favoriteButton.addEventListener("click", function() {
+            const movieId = favoriteForm.getAttribute("data-movie-id");
+            const csrfToken = document.querySelector("input[name=csrfmiddlewaretoken]").value;
+    
+            fetch(`/toggle_favorite/${movieId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                    "Content-Type": "application/json"
+                },
+                credentials: "same-origin"
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "added") {
+                    favoriteIcon.textContent = "❤️";  // Change to red heart
+                    favoriteIcon.classList.remove("text-gray-400");
+                    favoriteIcon.classList.add("text-red-500");
+                } else if (data.status === "removed") {
+                    favoriteIcon.textContent = "🤍";  // Change to gray heart
+                    favoriteIcon.classList.remove("text-red-500");
+                    favoriteIcon.classList.add("text-gray-400");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+    </script>
 {% endblock %}

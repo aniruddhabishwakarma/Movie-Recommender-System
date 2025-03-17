@@ -1,0 +1,77 @@
+{% extends "movies/base.html" %}
+{% load static %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-gray-800 rounded-xl p-6 shadow-lg text-white">
+    <h2 class="text-3xl font-bold text-blue-400 mb-4">Settings</h2>
+
+    <!-- Show success/error messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="p-3 text-white rounded-lg text-center {% if message.tags == 'success' %} bg-green-600 {% else %} bg-red-600 {% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Profile Picture -->
+        <div class="text-center">
+            {% if user_profile.profile_photo %}
+                <img src="{{ user_profile.profile_photo.url }}" class="w-24 h-24 rounded-full mx-auto shadow-lg">
+            {% else %}
+                <img src="/static/default-profile.jpg" class="w-24 h-24 rounded-full mx-auto shadow-lg" alt="Default Profile">
+            {% endif %}
+            <input type="file" name="profile_photo" class="block mx-auto mt-2">
+        </div>
+    
+        <!-- Full Name Field -->
+        <label for="full_name" class="block text-gray-300 font-semibold mt-4">Full Name:</label>
+        <input type="text" name="full_name" id="full_name" value="{{ user_profile.full_name|default_if_none:'' }}" required
+            class="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none">
+    
+        <!-- Contact Number Field -->
+        <label for="contact" class="block text-gray-300 font-semibold mt-4">Contact Number (Optional):</label>
+        <input type="text" name="contact" id="contact" value="{{ user_profile.contact|default_if_none:'' }}"
+            class="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none">
+    
+        <button type="submit"
+            class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg mt-4 transition-all duration-300 shadow-md">
+            Save Changes
+        </button>
+    </form>
+    
+    
+
+    <!-- Divider -->
+    <div class="border-t border-gray-600 my-6"></div>
+
+    <!-- Change Password Section -->
+    <h2 class="text-2xl font-bold text-blue-400 mb-4">Change Password</h2>
+
+    <form method="POST" action="{% url 'change_password' %}">
+        {% csrf_token %}
+
+        <div class="mb-4">
+            <label for="current_password" class="block text-gray-300 font-semibold">Current Password:</label>
+            <input type="password" id="current_password" name="current_password" required
+                class="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none">
+        </div>
+
+        <div class="mb-4">
+            <label for="new_password" class="block text-gray-300 font-semibold">New Password:</label>
+            <input type="password" id="new_password" name="new_password" required
+                class="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-300 focus:ring-2 focus:ring-blue-400 focus:outline-none">
+        </div>
+
+        <button type="submit"
+            class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 shadow-md">
+            Change Password
+        </button>
+    </form>
+</div>
+{% endblock %}

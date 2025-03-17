@@ -21,13 +21,18 @@ def movie_detail(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
     reviews = movie.reviews.all().order_by("-created_at")  # Get reviews for the movie
 
+    is_favorited = False
+    if request.user.is_authenticated:
+        is_favorited = Favorite.objects.filter(user=request.user, movie=movie).exists()
+
     # Fetch other movies by the same director (excluding the current movie)
     related_movies = Movie.objects.filter(director=movie.director).exclude(id=movie.id)[:5]
 
     return render(request, "movies/movie_detail.html", {
         "movie": movie,
         "reviews": reviews,
-        "related_movies": related_movies
+        "related_movies": related_movies,
+        "is_favorited": is_favorited,
     })
 
 def live_search(request):
@@ -57,7 +62,7 @@ def submit_review(request, movie_id):
         # ✅ Allow rating-only or review-only, but prevent empty submissions
         if not rating and not comment:
             messages.error(request, "You must provide either a rating or a review.")
-            return redirect("movie_details", movie_id=movie.id)
+            return redirect("movie_detail", movie_id=movie.id)
 
         if existing_review:
             # ✅ Update existing review (if user already reviewed)
@@ -77,18 +82,16 @@ def submit_review(request, movie_id):
             )
             messages.success(request, "Review submitted successfully!")
 
-    return redirect("movie_details", movie_id=movie.id)
+    return redirect("movie_detail", movie_id=movie.id)
 
 @login_required
 def toggle_favorite(request, movie_id):
-    """Add or Remove Movie from Favorites"""
+    """Add or Remove Movie from Favorites."""
     movie = get_object_or_404(Movie, id=movie_id)
     favorite, created = Favorite.objects.get_or_create(user=request.user, movie=movie)
 
     if not created:
         favorite.delete()  # ✅ Remove from favorites if already added
-        messages.success(request, f"Removed {movie.title} from favorites.")
+        return JsonResponse({"status": "removed"})  # ✅ Return JSON response
     else:
-        messages.success(request, f"Added {movie.title} to favorites!")
-
-    return redirect("movie_detail", movie_id=movie.id)
+        return JsonResponse({"status": "added"})  # ✅ Return JSON response

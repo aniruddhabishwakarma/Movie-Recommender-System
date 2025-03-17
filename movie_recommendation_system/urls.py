@@ -18,15 +18,19 @@ from django.contrib import admin
 from django.urls import path
 from movies.views.home_view import *
 from movies.views.auth_view import *
+from movies.views.profile_view import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", home, name="home"),
     path("movie/<int:movie_id>/", movie_detail, name="movie_detail"),
     path("search/", live_search, name="live_search"),
-     path("register/", register, name="register"),
+    path("register/", register, name="register"),
     path("login/", user_login, name="login"),
     path("logout/", user_logout, name="logout"),
-     path("movie/<int:movie_id>/review/", submit_review, name="submit_review"),
-     path("movie/<int:movie_id>/favorite/", toggle_favorite, name="toggle_favorite"),
+    path("movie/<int:movie_id>/review/", submit_review, name="submit_review"),
+    path("toggle_favorite/<int:movie_id>/", toggle_favorite, name="toggle_favorite"),
+    path("profile/", profile_view, name="profile"),
+    path("profile/settings/", settings_view, name="settings"),
+    path("profile/change-password/", change_password_view, name="change_password"),
 ]
