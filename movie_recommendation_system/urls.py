@@ -19,10 +19,13 @@ from django.urls import path
 from movies.views.home_view import *
 from movies.views.auth_view import *
 from movies.views.profile_view import *
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("", home, name="home"),
+    path("", home_view, name="home"),
     path("movie/<int:movie_id>/", movie_detail, name="movie_detail"),
     path("search/", live_search, name="live_search"),
     path("register/", register, name="register"),
@@ -32,5 +35,8 @@ urlpatterns = [
     path("toggle_favorite/<int:movie_id>/", toggle_favorite, name="toggle_favorite"),
     path("profile/", profile_view, name="profile"),
     path("profile/settings/", settings_view, name="settings"),
-    path("profile/change-password/", change_password_view, name="change_password"),
+    path("profile/change-password/", change_password, name="change_password"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

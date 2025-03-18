@@ -62,8 +62,7 @@ def user_login(request):
     return render(request, "movies/login.html")
 
 def user_logout(request):
-    """User Logout"""
-    if request.user.is_authenticated:
-        logout(request)
-        messages.success(request, "You have been logged out.")  # ✅ Success message
-    return redirect("home")  # ✅ Redirect to homepage after logout
+    """Handles user logout and redirects to the homepage."""
+    logout(request)  # ✅ Log out the user
+    messages.success(request, "You have been logged out successfully.")  # ✅ Display success message
+    return redirect("home")  # ✅ Redirect to home page instead of login page

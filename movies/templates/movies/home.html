@@ -1,20 +1,58 @@
 {% extends "movies/base.html" %}
 
-{% block title %}Home - Movie Recommender{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
-    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-900">
-        <h2 class="text-center text-4xl font-bold text-blue-400 mb-8">🎬 Random 20 Movies</h2>
+<div class="container mx-auto px-4">
 
-        <!-- Movie Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {% for movie in movies %}
-            <a href="{% url 'movie_detail' movie.id %}" class="backdrop-blur-md bg-white/10 p-4 rounded-xl shadow-lg transform hover:scale-105 transition duration-300 block">
-                <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="rounded-lg h-64 w-full object-cover">
-                <h3 class="text-lg font-semibold mt-2 text-white">{{ movie.title }}</h3>
-                <p class="text-sm text-gray-300">{{ movie.year }} | IMDb: <span class="text-yellow-400">{{ movie.imdb_rating }}</span></p>
-            </a>
+    <!-- ✅ "For You" Section (Content-Based Filtering) -->
+    {% if content_based_recommendations %}
+        <h2 class="text-2xl font-bold text-blue-400 mt-6">For You</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
+            {% for movie in content_based_recommendations %}
+                <a href="{% url 'movie_detail' movie.id %}" class="block bg-gray-800 rounded-xl shadow-lg hover:scale-105 transition duration-300">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="rounded-t-xl h-64 w-full object-cover">
+                    <div class="p-3">
+                        <h3 class="text-white font-bold">{{ movie.title }}</h3>
+                        <p class="text-gray-300 text-sm">{{ movie.year }} | IMDb: ⭐ {{ movie.imdb_rating }}</p>
+                    </div>
+                </a>
             {% endfor %}
         </div>
-    </div>
+    {% endif %}
+
+    <!-- ✅ "People Also Liked" Section (Collaborative Filtering) -->
+    {% if collaborative_recommendations %}
+        <h2 class="text-2xl font-bold text-blue-400 mt-10">People Also Liked</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
+            {% for movie in collaborative_recommendations %}
+                <a href="{% url 'movie_detail' movie.id %}" class="block bg-gray-800 rounded-xl shadow-lg hover:scale-105 transition duration-300">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="rounded-t-xl h-64 w-full object-cover">
+                    <div class="p-3">
+                        <h3 class="text-white font-bold">{{ movie.title }}</h3>
+                        <p class="text-gray-300 text-sm">{{ movie.year }} | IMDb: ⭐ {{ movie.imdb_rating }}</p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- ✅ "Trending Movies" Section (20 Random Movies if No Recommendations) -->
+    {% if random_movies %}
+        <h2 class="text-2xl font-bold text-blue-400 mt-10">Trending Movies</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
+            {% for movie in random_movies %}
+                <a href="{% url 'movie_detail' movie.id %}" class="block bg-gray-800 rounded-xl shadow-lg hover:scale-105 transition duration-300">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="rounded-t-xl h-64 w-full object-cover">
+                    <div class="p-3">
+                        <h3 class="text-white font-bold">{{ movie.title }}</h3>
+                        <p class="text-gray-300 text-sm">{{ movie.year }} | IMDb: ⭐ {{ movie.imdb_rating }}</p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
 {% endblock %}
+
