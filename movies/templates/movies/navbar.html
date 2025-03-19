@@ -1,28 +1,20 @@
 <head>
-    <style>
-        /* ✅ Live Search Styling */
-        #search-results {
-            position: absolute;
-            z-index: 50;  /* ✅ Ensures search results appear above everything */
-            width: 100%;
-            background-color: rgba(31, 41, 55, 0.95); /* Dark background */
-            border-radius: 0.5rem;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-            max-height: 300px; /* Prevents overflow */
-            overflow-y: auto; /* Enables scrolling if too many results */
-        }
-    </style>
+    <!-- Add Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <!-- Navbar Component -->
-<nav class="bg-gray-800 p-4 glass">
+<nav class="bg-gray-800 p-4 backdrop-blur-md bg-opacity-80 sticky top-0 z-40 font-sans">
     <div class="container mx-auto flex justify-between items-center">
-        <a href="/" class="text-xl font-bold text-blue-400">🎬 Movie Recommender</a>
+        <!-- Logo -->
+        <a href="/" class="text-xl font-bold text-blue-400 hover:text-blue-300 transition duration-300 flex items-center">
+            🎬 <span class="ml-2">Movie Recommender</span>
+        </a>
         
         <!-- Search Bar with Live Search -->
-        <div class="relative w-64">
+        <div class="relative w-96 mx-4">
             <input type="text" id="search-input" name="q" value="{{ query }}" placeholder="Search movies..."
-                class="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                class="w-full px-4 py-2 rounded-lg bg-gray-700 text-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300">
             
             <!-- Live Search Results -->
             <div id="search-results" class="absolute w-full bg-gray-800 text-white rounded-lg mt-1 hidden">
@@ -31,15 +23,24 @@
         </div>
 
         <!-- Navigation Links -->
-        <div class="flex items-center">
-            <a href="/" class="text-gray-300 hover:text-white px-4">Home</a>
-
+        <div class="flex items-center space-x-6">
+            <!-- User Authentication Links -->
             {% if user.is_authenticated %}
-                <a href="{% url 'profile' %}" class="text-gray-300 hover:text-white px-4">Profile</a>
-                <a href="{% url 'logout' %}" class="text-gray-300 hover:text-white px-4">Logout</a>
+                <div class="relative">
+                    <!-- User Icon -->
+                    <div id="user-icon" class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold cursor-pointer hover:bg-blue-600 transition duration-300">
+                        {{ user.username|first|upper }} <!-- Display first letter of username -->
+                    </div>
+                    <!-- Dropdown Menu -->
+                    <div id="dropdown-menu" class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg hidden">
+                        <a href="{% url 'profile' %}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-blue-400 transition duration-300">Profile</a>
+                        <a href="{% url 'logout' %}" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-blue-400 transition duration-300">Logout</a>
+                    </div>
+                </div>
             {% else %}
-                <a href="{% url 'login' %}" class="text-gray-300 hover:text-white px-4">Login</a>
-                <a href="{% url 'register' %}" class="text-gray-300 hover:text-white px-4">Register</a>
+                <a href="{% url 'login' %}" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-purple-600 transition duration-300">
+                    Login
+                </a>
             {% endif %}
         </div>
     </div>
@@ -49,7 +50,10 @@
 document.addEventListener("DOMContentLoaded", function() {
     const searchInput = document.getElementById("search-input");
     const resultsDiv = document.getElementById("search-results");
+    const userIcon = document.getElementById("user-icon");
+    const dropdownMenu = document.getElementById("dropdown-menu");
 
+    // Live search functionality
     searchInput.addEventListener("input", function() {
         let query = searchInput.value.trim();
         
@@ -63,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     data.results.forEach(movie => {
                         let movieItem = document.createElement("a");
                         movieItem.href = `/movie/${movie.id}/`;
-                        movieItem.className = "block px-4 py-2 hover:bg-gray-700";
+                        movieItem.className = "block px-4 py-2 hover:bg-gray-700 transition duration-300";
                         movieItem.innerHTML = `
                             <div class="flex items-center">
                                 <img src="${movie.poster_url}" class="w-10 h-14 mr-3 rounded" alt="${movie.title}">
@@ -84,10 +88,25 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Hide results when clicking outside
+    // Hide search results when clicking outside
     document.addEventListener("click", function(event) {
         if (!searchInput.contains(event.target) && !resultsDiv.contains(event.target)) {
             resultsDiv.classList.add("hidden");
+        }
+    });
+
+    // Toggle dropdown menu
+    if (userIcon) {
+        userIcon.addEventListener("click", function(event) {
+            event.stopPropagation(); // Prevent event from bubbling up
+            dropdownMenu.classList.toggle("hidden");
+        });
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", function(event) {
+        if (!userIcon.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.add("hidden");
         }
     });
 });
