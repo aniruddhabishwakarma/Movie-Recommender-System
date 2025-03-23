@@ -3,11 +3,10 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4">
-
+<div class="container mx-auto px-4 bg-black bg-opacity-40 backdrop-blur-lg mt-0">
     <!-- ✅ "For You" Section (Content-Based Filtering) -->
     {% if content_based_recommendations %}
-        <h2 class="text-2xl font-bold text-blue-400 mt-6">For You</h2>
+        <h2 class="text-2xl font-bold text-white mt-6">For You</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
             {% for movie in content_based_recommendations %}
                 <a href="{% url 'movie_detail' movie.id %}" class="block bg-gray-800 rounded-xl shadow-lg hover:scale-105 transition duration-300">
@@ -23,7 +22,7 @@
 
     <!-- ✅ "People Also Liked" Section (Collaborative Filtering) -->
     {% if collaborative_recommendations %}
-        <h2 class="text-2xl font-bold text-blue-400 mt-10">People Also Liked</h2>
+        <h2 class="text-2xl font-bold text-white">People Also Liked</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
             {% for movie in collaborative_recommendations %}
                 <a href="{% url 'movie_detail' movie.id %}" class="block bg-gray-800 rounded-xl shadow-lg hover:scale-105 transition duration-300">
@@ -39,8 +38,8 @@
 
     <!-- ✅ "Trending Movies" Section (20 Random Movies if No Recommendations) -->
     {% if random_movies %}
-        <h2 class="text-2xl font-bold text-blue-400 mt-10">Trending Movies</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
+        <h2 class="text-2xl font-bold text-white">Trending Movies</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-10">
             {% for movie in random_movies %}
                 <a href="{% url 'movie_detail' movie.id %}" class="block bg-gray-800 rounded-xl shadow-lg hover:scale-105 transition duration-300">
                     <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="rounded-t-xl h-64 w-full object-cover">
@@ -55,4 +54,3 @@
 
 </div>
 {% endblock %}
-
