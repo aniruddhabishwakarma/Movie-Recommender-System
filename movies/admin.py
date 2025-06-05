@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from movies.models.movie_model import *  #Import the model
 from movies.models.auth_model import UserProfile  # ✅ Import UserProfile
+from movies.models.admin_model import AdminUser
 
 # ✅ Register Movie Model
 
@@ -17,6 +18,7 @@ admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Movie)  # Register the model in Django Admin
 admin.site.register(Review)
 admin.site.register(Favorite)
+admin.site.register(AdminUser)
 
 
 

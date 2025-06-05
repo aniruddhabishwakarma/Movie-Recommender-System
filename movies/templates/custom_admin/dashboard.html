@@ -1,0 +1,50 @@
+{% extends "custom_admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+  <!-- 🟦 Total Movies -->
+  <div class="bg-zinc-900 rounded-xl shadow-lg p-6 relative hover:scale-[1.02] transition-all duration-300">
+    <div class="absolute top-4 right-4 bg-blue-600 p-2 rounded-lg text-white">
+      <i class="fas fa-play"></i>
+    </div>
+    <h2 class="text-lg font-medium mb-2">Total Movies</h2>
+    <p class="text-3xl font-bold">{{ total_movies }}</p>
+    <div class="mt-6 text-center">
+      <a href="{% url 'manage_movies' %}" class="border border-blue-600 text-blue-400 px-4 py-1 rounded hover:bg-blue-600 hover:text-white transition">
+        View Details
+      </a>
+    </div>
+  </div>
+
+  <!-- 🟧 Total Users -->
+  <div class="bg-zinc-900 rounded-xl shadow-lg p-6 relative hover:scale-[1.02] transition-all duration-300">
+    <div class="absolute top-4 right-4 bg-orange-500 p-2 rounded-lg text-white">
+      <i class="fas fa-user"></i>
+    </div>
+    <h2 class="text-lg font-medium mb-2">Total Users</h2>
+    <p class="text-3xl font-bold">{{ total_users }}</p>
+    <div class="mt-6 text-center">
+      <a href="{% url 'manage_users' %}" class="border border-orange-500 text-orange-400 px-4 py-1 rounded hover:bg-orange-500 hover:text-white transition">
+        View Details
+      </a>
+    </div>
+  </div>
+
+  <!-- 🤍 Total Interactions (Reviews) -->
+  <div class="bg-zinc-900 rounded-xl shadow-lg p-6 relative hover:scale-[1.02] transition-all duration-300">
+    <div class="absolute top-4 right-4 bg-gray-700 p-2 rounded-lg text-white">
+      <i class="fas fa-heart"></i>
+    </div>
+    <h2 class="text-lg font-medium mb-2">Total Interaction</h2>
+    <p class="text-3xl font-bold">{{ total_reviews }}</p>
+    <div class="mt-6 text-center">
+      <a href="{% url 'manage_reviews' %}" class="border border-gray-500 text-gray-300 px-4 py-1 rounded hover:bg-gray-600 hover:text-white transition">
+        View Details
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

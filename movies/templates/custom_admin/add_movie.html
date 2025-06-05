@@ -1,0 +1,74 @@
+{% extends "custom_admin/base.html" %}
+{% load static %}
+{% block title %}Add Movie{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto mt-6 text-white">
+  <!-- Back Button -->
+  <a href="{% url 'manage_movies' %}" class="inline-flex items-center gap-2 text-sm bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded">
+    <i class="fas fa-arrow-left"></i> Back to Movies
+  </a>
+</div>
+
+<div class="max-w-5xl mx-auto mt-4 text-white">
+  <h1 class="text-3xl font-bold mb-8 text-center">Add New Movie</h1>
+
+  <form method="POST" action="" class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-zinc-900 p-8 rounded-lg shadow">
+    {% csrf_token %}
+
+    <div>
+      <label class="block mb-1">Title</label>
+      <input type="text" name="title" class="w-full px-4 py-2 bg-zinc-800 rounded outline-none" placeholder="Movie title" />
+    </div>
+
+    <div>
+      <label class="block mb-1">Year</label>
+      <input type="text" name="year" class="w-full px-4 py-2 bg-zinc-800 rounded outline-none" placeholder="e.g. 2024" />
+    </div>
+
+    <div>
+      <label class="block mb-1">Genre</label>
+      <input type="text" name="genre" class="w-full px-4 py-2 bg-zinc-800 rounded outline-none" placeholder="e.g. Action, Drama" />
+    </div>
+
+    <div>
+      <label class="block mb-1">Director</label>
+      <input type="text" name="director" class="w-full px-4 py-2 bg-zinc-800 rounded outline-none" placeholder="Director name" />
+    </div>
+
+    <div class="md:col-span-2">
+      <label class="block mb-1">Actors</label>
+      <input type="text" name="actors" class="w-full px-4 py-2 bg-zinc-800 rounded outline-none" placeholder="Actor names separated by comma" />
+    </div>
+
+    <div class="md:col-span-2">
+      <label class="block mb-1">Plot</label>
+      <textarea name="plot" rows="3" class="w-full px-4 py-2 bg-zinc-800 rounded outline-none" placeholder="Plot summary"></textarea>
+    </div>
+
+    <div>
+      <label class="block mb-1">IMDb Rating</label>
+      <input type="text" name="imdb_rating" class="w-full px-4 py-2 bg-zinc-800 rounded outline-none" placeholder="e.g. 7.8" />
+    </div>
+
+    <div>
+      <label class="block mb-1">IMDb Votes</label>
+      <input type="text" name="imdb_votes" class="w-full px-4 py-2 bg-zinc-800 rounded outline-none" placeholder="e.g. 15645" />
+    </div>
+
+    <div>
+      <label class="block mb-1">Box Office</label>
+      <input type="text" name="box_office" class="w-full px-4 py-2 bg-zinc-800 rounded outline-none" placeholder="e.g. $500M" />
+    </div>
+
+    <div>
+      <label class="block mb-1">Poster URL</label>
+      <input type="text" name="poster_url" class="w-full px-4 py-2 bg-zinc-800 rounded outline-none" placeholder="https://..." />
+    </div>
+
+    <div class="md:col-span-2">
+      <button type="submit" class="w-full py-3 bg-gray-700 hover:bg-gray-600 rounded text-lg font-medium">Add Movie</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

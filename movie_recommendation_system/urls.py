@@ -19,8 +19,10 @@ from django.urls import path
 from movies.views.home_view import *
 from movies.views.auth_view import *
 from movies.views.profile_view import *
+from movies.views.admin_view import *
 from django.conf import settings
 from django.conf.urls.static import static
+
 
 
 urlpatterns = [
@@ -36,6 +38,17 @@ urlpatterns = [
     path("profile/", profile_view, name="profile"),
     path("profile/settings/", settings_view, name="settings"),
     path("profile/change-password/", change_password, name="change_password"),
+
+    path("admin-panel/login/", admin_login, name="admin_login"),
+    path("admin-panel/", admin_dashboard, name="admin_dashboard"),
+    path("admin-panel/logout/", admin_logout, name="admin_logout"),
+    path("admin-panel/users/", manage_users, name="manage_users"),
+    path("admin-panel/movies/", manage_movies, name="manage_movies"),
+    path("admin-panel/reviews/", manage_reviews, name="manage_reviews"),
+    path("admin-panel/movies/add/", add_movie, name="add_movie"),
+    path("admin-panel/movies/edit/<int:movie_id>/", edit_movie, name="edit_movie"),
+    path("admin-panel/movies/delete/<int:movie_id>/", delete_movie, name="delete_movie"),
+
 ]
 
 if settings.DEBUG:
